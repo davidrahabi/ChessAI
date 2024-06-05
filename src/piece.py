@@ -1,4 +1,11 @@
 import os
+
+"""
+Piece class: serves as the blueprint for creating each chess piece class that inherit this class
+             sets the tecture of each piece that is displayed on the board
+             sets the valid moves that the piece can make from its position
+
+"""
 class Piece:
 
     def __init__(self, name, color, value, texture = None, texture_rect = None):

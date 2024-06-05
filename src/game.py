@@ -1,11 +1,16 @@
 import pygame
 from const import *
 from board import Board
+from dragger import Dragger
 
+"""
+Game Class: shows board and pieces on screen, initializes board and mouse dragger objects
+"""
 class Game:
 
     def __init__(self):
         self.board = Board()
+        self.dragger = Dragger()
 
     def show_bg(self,surface): #surface will be self.screen from main
         #draw board
@@ -29,9 +34,11 @@ class Game:
                 if self.board.squares[row][col].has_piece():
                     piece = self.board.squares[row][col].piece
                     
-                    
-                    img = pygame.image.load(piece.texture) #load the pieces image
-                    img_center = col * SQSIZE + SQSIZE // 2, row * SQSIZE + SQSIZE //2 #calculates center of the square the piece will be placed in
+                    #blit all pieces except a piece that is being dragged
+                    if piece is not self.dragger.piece:
+                        piece.set_texture(size = 80)
+                        img = pygame.image.load(piece.texture) #load the pieces image
+                        img_center = col * SQSIZE + SQSIZE // 2, row * SQSIZE + SQSIZE //2 #calculates center of the square the piece will be placed in
 
-                    piece.texture_rect = img.get_rect(center = img_center)
-                    surface.blit(img, piece.texture_rect) #blit displays the image using img and the destination rectangle
+                        piece.texture_rect = img.get_rect(center = img_center)
+                        surface.blit(img, piece.texture_rect) #blit displays the image using img and the destination rectangle

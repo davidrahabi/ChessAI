@@ -1,3 +1,6 @@
+"""
+Square class: for creating and holding info about each square's location and whether it contains a piece
+"""
 class Square:
 
     def __init__(self, row, col, piece = None):

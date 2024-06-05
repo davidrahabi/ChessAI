@@ -1,6 +1,10 @@
 from const import *
 from square import  Square
 from piece import *
+"""
+Board class: creates board full of square objects, then adds the pieces to the board
+"""
+
 class Board:
 
     def __init__(self):
