@@ -12,9 +12,12 @@ class Main:
         self.game = Game()
 
     def mainloop(self):
+        game = self.game
+        screen = self.screen
         while True:
-            self.game.show_bg(self.screen)  #this loop will keep running and continually update teh screen
-
+            game.show_bg(screen)  #this loop will keep running and continually update teh screen
+            game.show_pieces(screen) #show pieces
+            
             for event in pygame.event.get(): #looks through all possible game events (user actions)
                 if event.type ==pygame.QUIT: #if event is a quit by the user, end game
                     pygame.quit()
