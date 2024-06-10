@@ -26,8 +26,10 @@ class Piece:
             f'assets/images/imgs-{size}px/{self.color}_{self.name}.png'
         )
 
-    def add_moves(self, move): #append move to moves attribute
+    #adds valid moves of a piece from its current position
+    def add_move(self, move): #append move to moves attribute
         self.moves.append(move)
+        
 
 class Pawn(Piece): #pawn inherits piece class
 
