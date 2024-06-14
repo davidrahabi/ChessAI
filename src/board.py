@@ -46,6 +46,22 @@ class Board:
                 else: break #break if out of range
                     
             #diagonal moves
+            move_row = row + piece.dir
+            possible_move_cols = [col-1, col+1]
+
+            for possible_col in possible_move_cols:
+                if Square.in_range(move_row, possible_col):
+                    if self.squares[move_row][possible_col].has_rival_piece(piece.color):
+                        initial = Square(move_row,possible_col)
+                        final = Square(move_row, possible_col)
+
+                        #create new move
+                        new_move = Move(initial, final)
+
+                        #append new valid move
+                        piece.add_move(new_move)
+
+            
             
 
 
@@ -103,7 +119,7 @@ class Board:
         #adding pawns
         for col in range(COLS): 
             self.squares[row_pawn][col] = Square(row_pawn, col, Pawn(color))
-
+                    
         #knights
 
         self.squares[row_other][1] = Square(row_other, 1, Knight(color))
