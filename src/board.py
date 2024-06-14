@@ -74,7 +74,7 @@ class Board:
             for move in possible_moves:
                 move_row, move_col = move
                 if Square.in_range(move_row, move_col):
-                    if (self.squares[move_row][move_col].isempty_or_rival(piece.color)):
+                    if self.squares[move_row][move_col].isempty_or_rival(piece.color):
                         #create squares for new move
                         initial = Square(row,col)
                         final = Square(move_row,move_col)
@@ -86,21 +86,89 @@ class Board:
                         piece.add_move(new_move)
                         
                         
-                
+        def straightline_moves(incrs):
+            #  for bishop, rook, and queen moves in a straight line
+            #  the increments between their moves differ
+            # incrs refers to how their their (row, col) values can be incremented differently to change their position
+            for dir in incrs:
+                possible_row = row + dir[0]
+                possible_col = col + dir[1]
+
+                while(Square.in_range(possible_row, possible_col)):
+                    if self.squares[possible_row][possible_col].isempty_or_rival(piece.color):
+                        #create squares for new move
+                        initial = Square(row,col)
+                        final = Square(possible_row,possible_col)
+
+                        #create new move
+                        new_move = Move(initial, final)
+
+                        #append new valid move
+                        piece.add_move(new_move)
+
+                        if self.squares[possible_row][possible_col].has_rival_piece(piece.color):
+                            break
+                    else:
+                        break
+
+                    possible_row += dir[0]
+                    possible_col += dir[1]
+
+        
+
+
+
+        def king_moves():
+            adjs = [
+                (row+1, col+1), (row-1, col+1), (row+1, col-1), (row-1,col-1), 
+                (row, col+1), (row, col-1), (row+1, col), (row-1, col)
+            ]
+            #normal moves
+            for move in adjs:
+                move_row, move_col = move
+                if Square.in_range(move_row, move_col):
+                    if self.squares[move_row][move_col].isempty_or_rival(piece.color):
+                        #create squares for new move
+                        initial = Square(row,col)
+                        final = Square(move_row,move_col)
+
+                        #create new move
+                        new_move = Move(initial, final)
+
+                        #append new valid move
+                        piece.add_move(new_move)
+
+            #kingside castling
+            if (not piece.moved) and (self.squares[row][7].has_piece()) and (not self.squares[row][7].piece.moved) and (self.squares[row][col+1].isempty) and (self.squares[row][col+2].isempty):
+                initial = Square(row,col)
+                final = Square(row, 7)
+
+                #create new move
+                new_move = Move(initial, final)
+
+                #append new valid move
+                piece.add_move(new_move)
+
+            #queenside castling
 
 
         if isinstance(piece, Pawn): pawn_moves()
 
         elif isinstance(piece,Knight):knight_moves()
             
-        elif isinstance(piece,Bishop):
-            pass
-        elif isinstance(piece,Rook):
-            pass
-        elif isinstance(piece,Queen):
-            pass
-        elif isinstance(piece,King):
-            pass
+        elif isinstance(piece,Bishop): straightline_moves([
+            (-1, 1), (-1, -1), (1, -1), (1,1)
+        ])
+        elif isinstance(piece,Rook): straightline_moves([
+            (1,0), (-1,0), (0,1), (0,-1)
+        ])
+            
+        elif isinstance(piece,Queen): straightline_moves([
+            (-1, 1), (-1, -1), (1, -1), (1,1),
+            (1,0), (-1,0), (0,1), (0, -1)
+        ])
+            
+        elif isinstance(piece,King): king_moves()
 
     def _create(self): #an underscore before a method shows that they are private methods
         self.squares = [[0,0,0,0,0,0,0,0] for col in range(COLS)] #each column will have a list of 8 zeros representing squares
@@ -121,7 +189,7 @@ class Board:
             self.squares[row_pawn][col] = Square(row_pawn, col, Pawn(color))
                     
         #knights
-
+         
         self.squares[row_other][1] = Square(row_other, 1, Knight(color))
         self.squares[row_other][6] = Square(row_other, 6, Knight(color))
 
@@ -129,7 +197,7 @@ class Board:
 
         self.squares[row_other][2] = Square(row_other, 2, Bishop(color))
         self.squares[row_other][5] = Square(row_other, 5, Bishop(color))
-
+        
         #rooks
         self.squares[row_other][0] = Square(row_other, 0, Rook(color))
         self.squares[row_other][7] = Square(row_other, 7, Rook(color))
