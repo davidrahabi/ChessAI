@@ -30,7 +30,9 @@ class Piece:
     def add_move(self, move): #append move to moves attribute
         self.moves.append(move)
         
-
+    def clear_moves(self):
+        self.moves = []
+        
 class Pawn(Piece): #pawn inherits piece class
 
     def __init__(self, color):

@@ -10,11 +10,30 @@ class Board:
 
     def __init__(self):
         self.squares = []
+        self.last_move = None
         self._create()
         self._add_pieces('white')
         self._add_pieces('black')
 
-    
+    def move(self, piece, move):
+        initial = move.initial
+        final = move.final
+
+        #update board
+
+        self.squares[initial.row][initial.col].piece = None
+        self.squares[final.row][final.col].piece = piece
+
+        piece.moved = True
+
+        piece.clear_moves()
+
+        self.last_move = move
+
+
+
+    def valid_move(self, piece, move):
+                return move in piece.moves
     def calc_moves(self, piece, row, col):
         """
         calculates all valid moves for a piece from its position
@@ -33,7 +52,7 @@ class Board:
                 # if the pawn has moved, it will just run once
                 if Square.in_range(move_row):
                     if self.squares[move_row][col].isempty():
-                        initial = Square(move_row,col)
+                        initial = Square(row,col)
                         final = Square(move_row, col)
 
                         #create new move
@@ -52,7 +71,7 @@ class Board:
             for possible_col in possible_move_cols:
                 if Square.in_range(move_row, possible_col):
                     if self.squares[move_row][possible_col].has_rival_piece(piece.color):
-                        initial = Square(move_row,possible_col)
+                        initial = Square(row,col)
                         final = Square(move_row, possible_col)
 
                         #create new move
@@ -187,7 +206,7 @@ class Board:
         #adding pawns
         for col in range(COLS): 
             self.squares[row_pawn][col] = Square(row_pawn, col, Pawn(color))
-                    
+
         #knights
          
         self.squares[row_other][1] = Square(row_other, 1, Knight(color))

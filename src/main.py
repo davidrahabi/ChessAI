@@ -2,6 +2,8 @@ import pygame
 import sys
 from const import *
 from game import Game
+from square import Square
+from move import Move
 
 """
 Main Class: creates the screen and starts the game
@@ -70,6 +72,26 @@ class Main:
 
                 #if user unclicks mouse
                 elif event.type == pygame.MOUSEBUTTONUP: 
+                    if dragger.dragging:
+                        dragger.update_mouse(event.pos)
+
+                        released_row = dragger.mouseY // SQSIZE
+                        released_col = dragger.mouseX // SQSIZE
+                        
+
+                        #create possible move
+                        initial = Square(dragger.initial_row, dragger.initial_col)
+                        final = Square(released_row, released_col)
+
+                        new_move = Move(initial,final)
+
+                        if board.valid_move(dragger.piece, new_move):
+                            
+
+                            board.move(dragger.piece, new_move)
+                            #show methods
+                            game.show_bg(screen)
+                            game.show_pieces(screen)
                     dragger.undrag_piece(piece)
 
                 #if event is a quit by the user, end game
