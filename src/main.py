@@ -24,9 +24,11 @@ class Main:
         dragger = self.game.dragger
         while True:
             game.show_bg(screen)  #this loop will keep running and continually update the screen
+            game.show_last_move(screen)
             game.show_moves(screen)
             game.show_pieces(screen) #show pieces
-
+            game.show_hover(screen)
+            
             #extra update blit if a piece is being dragged to render it faster/smoother
             if dragger.dragging:
                 dragger.update_blit(screen)
@@ -45,28 +47,38 @@ class Main:
                     #if clicked square has a piece
                     if board.squares[clicked_row][clicked_col].has_piece():
                         piece = board.squares[clicked_row][clicked_col].piece #saving ref to piece
-                        board.calc_moves(piece, clicked_row, clicked_col)
-                        dragger.save_initial(event.pos) #save initial position of piece
-                        dragger.drag_piece(piece)
+                        # check if clicked piece is a valid color, as in it is the color of the next turn to move
+                        if piece.color == game.next_player:
+                            board.calc_moves(piece, clicked_row, clicked_col)
+                            dragger.save_initial(event.pos) #save initial position of piece
+                            dragger.drag_piece(piece)
 
-                        #show methods
-                        game.show_bg(screen)
-                        game.show_moves(screen)
-                        game.show_pieces(screen)
+                            #show methods
+                            game.show_bg(screen)
+                            game.show_last_move(screen)
+                            game.show_moves(screen)
+                            game.show_pieces(screen)
 
                     
 
                 #if user moves mouse
                 elif event.type == pygame.MOUSEMOTION: 
+                    motion_row = event.pos[1] // SQSIZE
+                    motion_col = event.pos[0] // SQSIZE
+                    if Square.in_range(motion_col, motion_row):
+                        game.set_hover(motion_row, motion_col)
+                    
+    
                     if dragger.dragging: #if the user has a piece currently clicked
                         dragger.update_mouse(event.pos)
 
                         #adding extra blit for background and pieces to create smoother animation when dragging
                         #show methods
                         game.show_bg(screen) 
+                        game.show_last_move(screen)
                         game.show_moves(screen)
                         game.show_pieces(screen)
-
+                        game.show_hover(screen)
                         dragger.update_blit(screen) #blit depends on mouse position, so updated mouse first
 
 
@@ -91,7 +103,10 @@ class Main:
                             board.move(dragger.piece, new_move)
                             #show methods
                             game.show_bg(screen)
+                            game.show_last_move(screen)
                             game.show_pieces(screen)
+
+                            game.next_turn()
                     dragger.undrag_piece(piece)
 
                 #if event is a quit by the user, end game
