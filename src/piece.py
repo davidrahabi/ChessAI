@@ -45,6 +45,9 @@ class Pawn(Piece): #pawn inherits piece class
 
 class Knight(Piece):
      def __init__(self, color):
+        self.left_rook=None
+        self.right_rook=None
+        
         super().__init__("knight", color, 3.0)
 
 class Bishop(Piece):
