@@ -49,7 +49,8 @@ class Main:
                         piece = board.squares[clicked_row][clicked_col].piece #saving ref to piece
                         # check if clicked piece is a valid color, as in it is the color of the next turn to move
                         if piece.color == game.next_player:
-                            board.calc_moves(piece, clicked_row, clicked_col)
+                            piece.clear_moves()
+                            board.calc_moves(piece, clicked_row, clicked_col, bool=True)
                             dragger.save_initial(event.pos) #save initial position of piece
                             dragger.drag_piece(piece)
 
