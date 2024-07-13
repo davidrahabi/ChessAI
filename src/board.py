@@ -3,6 +3,8 @@ from square import  Square
 from piece import *
 from move import Move
 import copy
+from sound import Sound
+import os
 """
 Board class: creates board full of square objects, then adds the pieces to the board
 """
@@ -20,16 +22,29 @@ class Board:
         initial = move.initial
         final = move.final
 
+        en_passant_empty = self.squares[final.row][final.col].isempty()
+
         #update board
 
         self.squares[initial.row][initial.col].piece = None
         self.squares[final.row][final.col].piece = piece
 
 
-
         #pawn promotion
         if isinstance(piece, Pawn):
-            self.check_promotion(piece, final)
+             #en passat capture
+            diff = final.col - initial.col
+            if diff!=0 and en_passant_empty:
+                self.squares[initial.row][initial.col + diff].piece = None
+                self.squares[final.row][final.col].piece = piece
+                if not testing:
+                    sound  = Sound(os.path.join('assets/sounds/capture.wav'))
+                    sound.play()
+
+            
+            else:
+                #promotion
+                self.check_promotion(piece, final)
 
 
         #king castling (the king is already moved in the #update board by the time it hits this)
@@ -47,6 +62,22 @@ class Board:
         piece.clear_moves()
 
         self.last_move = move
+
+ 
+    
+    def set_true_en_passant(self, piece):
+        if not isinstance(piece, Pawn):
+            return
+        else:
+            for row in range(ROWS):
+                for col in range(COLS):
+                    if isinstance(self.squares[row][col].piece, Pawn):
+                        self.squares[row][col].piece.en_pessant = False
+            piece.en_pessant= True
+
+
+
+       
 
 
     def castling(self,initial,final):
@@ -142,7 +173,45 @@ class Board:
                             #so in_check will not get called again in the first part of this if statement
                             piece.add_move(new_move)
 
-            
+            #enpessant
+            r = 3 if piece.color == 'white' else 4 #inital row that an enpassant would take place
+            fr = 2 if piece.color == 'white' else 5 #final row that an en passant would take place
+
+            #left en passant
+            if Square.in_range(col-1) and row==r:
+                if self.squares[row][col-1].has_rival_piece(piece.color):
+                    p = self.squares[row][col-1].piece
+                    if isinstance(p, Pawn):
+                        if p.en_pessant:
+                            initial = Square(row,col)
+                            
+                            final_piece = self.squares[row][col-1].piece
+                            final = Square(fr, col-1, final_piece)
+                            #create new move
+                            new_move = Move(initial, final)
+                            if bool:
+                                if not self.in_check(piece, new_move):
+                                    piece.add_move(new_move)
+                            else:
+                                piece.add_move(new_move)
+
+             #right en passant
+            if Square.in_range(col+1) and row==r:
+                if self.squares[row][col+1].has_rival_piece(piece.color):
+                    p = self.squares[row][col+1].piece
+                    if isinstance(p, Pawn):
+                        if p.en_pessant:
+                            initial = Square(row,col)
+                            final_piece = self.squares[row][col+1].piece
+                            final = Square(fr, col+1, final_piece)
+                            #create new move
+                            new_move = Move(initial, final)
+                            if bool:
+                                if not self.in_check(piece, new_move):
+                                    piece.add_move(new_move)
+                            else:
+                                piece.add_move(new_move)
+
             
 
 
