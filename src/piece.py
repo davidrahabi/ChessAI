@@ -40,6 +40,7 @@ class Pawn(Piece): #pawn inherits piece class
                           #direction that the pawn travels is dependent on its color
                           #in pygame, the x axis increases going to the right, and the y axis 
                           #going downwards starting from the top row
+        self.en_pessant = False
 
         super().__init__('pawn', color, 1.0)     #call piece class init method
 

@@ -102,6 +102,7 @@ class Main:
                             captured=board.squares[released_row][released_col].has_piece()
 
                             board.move(dragger.piece, new_move)
+                            board.set_true_en_passant(dragger.piece)
 
                             #sounds
                             game.play_sound(captured)
