@@ -16,12 +16,17 @@ class Main:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT)) #creates screen
         pygame.display.set_caption('Chess')
         self.game = Game()
+        self.popup_active= False
+        self.restart_button=None
+        self.cancel_button=None
+
 
     def mainloop(self):
         game = self.game
         board = self.game.board
         screen = self.screen
         dragger = self.game.dragger
+        
         while True:
             game.show_bg(screen)  #this loop will keep running and continually update the screen
             game.show_last_move(screen)
@@ -34,9 +39,25 @@ class Main:
                 dragger.update_blit(screen)
 
             for event in pygame.event.get(): #looks through all possible game events (user actions)
-                
+                 #if event is a quit by the user, end game
+                if event.type ==pygame.QUIT: 
+                    pygame.quit()
+                    sys.exit()
+
+                elif self.popup_active:
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse_x, mouse_y = event.pos
+                        if self.restart_button.collidepoint((mouse_x, mouse_y)):
+                            game.reset()
+                            game = self.game
+                            board = self.game.board
+                            dragger = self.game.dragger
+                            self.popup_active = False
+                        elif self.cancel_button.collidepoint((mouse_x, mouse_y)):
+                            self.popup_active = False
+
                 #if the user clicks
-                if event.type == pygame.MOUSEBUTTONDOWN: 
+                elif event.type == pygame.MOUSEBUTTONDOWN: 
                     dragger.update_mouse(event.pos) #updates pos with position of the event click
 
                     clicked_row = dragger.mouseY // SQSIZE #moving along y axis affects what row you are on
@@ -120,20 +141,52 @@ class Main:
                     if event.key == pygame.K_t:
                         game.change_theme()
                     
-                    if event.key == pygame.K_r:
-                        game.reset()
-                        game = self.game
-                        board = self.game.board
-                        dragger = self.game.dragger
+                    if event.key == pygame.K_r and not self.popup_active:
+                        self.popup_active = True
 
-                #if event is a quit by the user, end game
-                elif event.type ==pygame.QUIT: 
-                    pygame.quit()
-                    sys.exit()
+            
+
+               
 
 
+            if self.popup_active:
+                self.draw_reset_popup()
 
             pygame.display.update() #updates screen
+        
+    
+
+    def draw_reset_popup(self):
+        popup_width = 400
+        popup_height = 200
+        popup_x = (WIDTH - popup_width) // 2
+        popup_y = (HEIGHT - popup_height) // 2
+
+        white = (255, 255, 255)
+        black = (0, 0, 0)
+        gray = (169, 169, 169)
+
+        pygame.draw.rect(self.screen, gray, (popup_x, popup_y, popup_width, popup_height))
+
+        font = pygame.font.Font(None, 36)
+        self.draw_text("Are you sure you want to restart?", font, black, self.screen, popup_x + 10, popup_y + 20)
+
+        
+        self.restart_button = pygame.Rect(popup_x + 50, popup_y + 100, 100, 50)
+        self.cancel_button = pygame.Rect(popup_x + 250, popup_y + 100, 100, 50)
+
+        pygame.draw.rect(self.screen, black, self.restart_button)
+        pygame.draw.rect(self.screen, black, self.cancel_button)
+
+        self.draw_text("Restart", font, white, self.screen, popup_x + 60, popup_y + 115)
+        self.draw_text("Cancel", font, white, self.screen, popup_x + 260, popup_y + 115)
+
+    def draw_text(self, text, font, color, surface, x, y):
+        textobj = font.render(text, True, color)
+        textrect = textobj.get_rect()
+        textrect.topleft = (x, y)
+        surface.blit(textobj, textrect)
+
 
 main = Main()
 
